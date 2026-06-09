@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>GoalMate 2026</title>
+  <link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22GoalMate%202026%22%2C%22short_name%22%3A%22GoalMate%22%2C%22start_url%22%3A%22.%2Findex.html%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23004d40%22%2C%22theme_color%22%3A%22%23004d40%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%20100%20100'%3E%3Ccircle%20cx%3D'50'%20cy%3D'50'%20r%3D'45'%20fill%3D'%23004d40'%2F%3E%3Ctext%20x%3D'50'%20y%3D'65'%20font-size%3D'40'%20text-anchor%3D'middle'%20fill%3D'white'%3E%E2%9A%BD%3C%2Ftext%3E%3C%2Fsvg%3E%22%2C%22sizes%22%3A%22100x100%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="GoalMate 2026">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23004d40'/><text x='50' y='65' font-size='40' text-anchor='middle' fill='white'>⚽</text></svg>">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f0f4f3; color: #1e2b2c; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+    .header { background: #004d40; color: white; padding: 12px 16px; text-align: center; font-weight: bold; font-size: 1.2em; position: relative; }
+    .disclaimer-bar { background: #b2dfdb; font-size: 0.7em; text-align: center; padding: 4px 8px; }
+    .content { flex: 1; overflow-y: auto; padding: 16px; -webkit-overflow-scrolling: touch; }
+    .tab-bar { display: flex; background: #ffffff; border-top: 1px solid #ccc; }
+    .tab { flex: 1; text-align: center; padding: 10px 5px; font-size: 0.7em; color: #555; cursor: pointer; border: none; background: none; }
+    .tab.active { color: #004d40; font-weight: bold; border-top: 2px solid #004d40; }
+    .section { display: none; }
+    .section.active { display: block; }
+    .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    .btn { background: #004d40; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-block; margin: 4px 0; }
+    .btn.secondary { background: #e0f2f1; color: #004d40; }
+    .flex-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    input, select { padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 100%; margin: 6px 0; }
+    .large-text { font-size: 1.5em; }
+    .mt-2 { margin-top: 16px; }
+    .alert { background: #fff3e0; padding: 12px; border-radius: 8px; }
+    .welcome { background: #e8f5e9; border-left: 4px solid #2e7d32; }
+  </style>
+</head>
+<body>
+  <div class="header">⚽ GoalMate 2026</div>
+  <div class="disclaimer-bar">We only provide information. No medical, legal, or professional advice. Halal & family-friendly.</div>
+  <div class="content" id="content"></div>
+  <div class="tab-bar">
+    <button class="tab active" data-section="match">Match</button>
+    <button class="tab" data-section="faith">Faith</button>
+    <button class="tab" data-section="travel">Travel</button>
+    <button class="tab" data-section="health">Health</button>
+    <button class="tab" data-section="family">Family</button>
+    <button class="tab" data-section="wallet">Wallet</button>
+    <button class="tab" data-section="premium">Premium</button>
+  </div>
+
+<script>
+// --- Service Worker for offline caching ---
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('data:application/javascript,' + encodeURIComponent(
+      "self.addEventListener('fetch', e => { e.respondWith(fetch(e.request).catch(() => caches.match(e.request))); }); self.addEventListener('install', e => { e.waitUntil(caches.open('goalmate').then(c => c.addAll(['./']))); });"
+    )).catch(() => {});
+  });
+}
+
+// --- Tab Navigation ---
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const section = tab.dataset.section;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(section).classList.add('active');
+  });
+});
+
+const content = document.getElementById('content');
+const premiumUnlocked = localStorage.getItem('goalmate_premium') === 'true';
+let elderlyMode = false;
+
+// --- Helper functions ---
+function showAnalysis() { alert("Tactical breakdown: USA high press forced Brazil errors. (Mock analysis)"); }
+function getQibla() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(() => {
+      alert('Qibla direction from your location: approximately 58° from North (New York).');
+    }, () => alert('Enable location for Qibla.'));
+  }
+}
+function toggleElderly() {
+  elderlyMode = !elderlyMode;
+  document.body.style.fontSize = elderlyMode ? '1.3em' : '';
+  renderAll();
+}
+function restReminder() { alert('Rest reminder: take a break every hour.'); }
+function startFlagGame() {
+  const flags = { '🇺🇸': 'usa', '🇧🇷': 'brazil', '🇩🇪': 'germany' };
+  const keys = Object.keys(flags);
+  const pick = keys[Math.floor(Math.random() * keys.length)];
+  const guess = prompt('Which country is ' + pick + '?');
+  if (guess && guess.toLowerCase() === flags[pick]) alert('Correct!');
+  else alert('It was ' + flags[pick] + '.');
+}
+function trivia() {
+  const answer = prompt('Most World Cup wins?');
+  if (answer && answer.toLowerCase() === 'brazil') alert('Correct!');
+  else alert('Brazil (5 titles).');
+}
+function createScarf() {
+  const canvas = document.createElement('canvas');
+  canvas.width = 300; canvas.height = 100;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#B22234'; ctx.fillRect(0,0,300,100);
+  ctx.fillStyle = 'white'; ctx.font = 'bold 30px sans-serif'; ctx.fillText('USA!', 100, 60);
+  const win = window.open('', '_blank');
+  win.document.write('<img src="'+canvas.toDataURL()+'"><p>Save this image!</p>');
+}
+function convertCurrency() {
+  const rates = { USD:1, CAD:1.35, MXN:17.5, PKR:285 };
+  const from = document.getElementById('fromCurrency').value;
+  const amount = parseFloat(document.getElementById('amount').value)||0;
+  const pkr = (amount / rates[from]) * rates.PKR;
+  document.getElementById('converted').textContent = pkr.toFixed(2) + ' PKR';
+}
+function unlockPremium() {
+  if (document.getElementById('premiumCode').value.trim() === 'WC2026FREE') {
+    localStorage.setItem('goalmate_premium', 'true');
+    alert('Premium unlocked! Enjoy all features.');
+    location.reload();
+  } else alert('Invalid code.');
+}
+function shareLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const url = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+      if (navigator.share) {
+        navigator.share({ title: 'My Location', text: 'Here is my current location.', url });
+      } else {
+        prompt('Share this link with family:', url);
+      }
+    }, () => alert('Could not get location.'));
+  } else alert('Geolocation not supported.');
+}
+function fetchWeather() {
+  const city = document.getElementById('weatherCity').value;
+  const [lat, lon] = city.split(',');
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`)
+    .then(r => r.json())
+    .then(data => {
+      const w = data.current_weather;
+      document.getElementById('weatherResult').innerHTML = 
+        `<strong>${w.temperature}°C</strong>, Wind: ${w.windspeed} km/h, Code: ${w.weathercode}`;
+    })
+    .catch(() => document.getElementById('weatherResult').textContent = 'Weather unavailable offline. Connect to internet.');
+}
+
+// --- Section Renderers ---
+function renderMatchCenter() {
+  const openingMatch = new Date('2026-06-11T15:00:00-05:00');
+  const now = new Date();
+  const diff = openingMatch - now;
+  let countdown = 'Countdown begins soon!';
+  if (diff > 0) {
+    const days = Math.floor(diff / (1000*60*60*24));
+    const hours = Math.floor((diff % (1000*60*60*24)) / (1000*60*60));
+    const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+    countdown = `${days}d ${hours}h ${mins}m to opening match`;
+  } else if (diff <= 0 && diff > -86400000*2) countdown = 'World Cup is underway!';
+  
+  return `
+    <div class="section active" id="match">
+      <div class="card welcome">
+        <h4>🌍 Welcome to GoalMate 2026</h4>
+        <p>Whether you’re traveling to the matches or cheering from home, young or old, rich or just getting by, solo or with family — and whatever you believe in — this app is built for you. Football belongs to everyone. So does GoalMate.</p>
+      </div>
+      <div class="card">
+        <h3>🇺🇸 USA vs 🇧🇷 Brazil</h3>
+        <p><strong>2 - 1</strong> (Half Time)</p>
+        <p>Goals: Pulisic (23'), Rodrygo (67')</p>
+        <p class="mt-2"><strong>⏱️ ${countdown}</strong></p>
+        <div class="flex-row">
+          <button class="btn" onclick="alert('Alerts require notification permission.')">🔔 Smart Alerts</button>
+          <button class="btn secondary" onclick="showAnalysis()">📊 Tactical Breakdown</button>
+        </div>
+        <p class="mt-2"><em>Replace with live data: get free API key from football-data.org</em></p>
+      </div>
+      <div class="card">
+        <h4>📺 Official Highlights</h4>
+        <iframe width="100%" height="200" src="https://www.youtube.com/embed/4rp2aLemFh0" frameborder="0" allowfullscreen></iframe>
+        ${premiumUnlocked ? '<div class="card mt-2"><h4>📺 Full Replays (Premium)</h4><iframe width="100%" height="200" src="https://www.youtube.com/embed/videoseries?list=PLCGIzmTE4d0j7n2FV5C_kFWEtLrLhXZnz" frameborder="0" allowfullscreen></iframe></div>' : '<p class="mt-2"><em>Upgrade to Premium for full match replays.</em></p>'}
+      </div>
+      <div class="card">
+        <h4>👤 Player Profile: Christian Pulisic</h4>
+        <p>Country: USA | Position: Winger | WC Goals: 3</p>
+      </div>
+      <div class="card">
+        <h4>📜 This Day in World Cup History</h4>
+        <p>June 9, 2014: Netherlands 5-1 Spain</p>
+      </div>
+      <div class="card">
+        <h4>🟢 Fair Play Meter</h4>
+        <p>Fouls: 4 | Yellow Cards: 1 | Respect: High</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderFaith() {
+  return `
+    <div class="section" id="faith">
+      <p style="text-align:center; margin-bottom:12px;">Places of worship for all faiths — because football fans come from every belief.</p>
+      <div class="card"><h3>🕌 Muslim Prayer Times (NY)</h3><p>Fajr: 4:32 | Dhuhr: 1:00 | Asr: 5:45 | Maghrib: 8:32 | Isha: 10:02</p>
+      <button class="btn secondary" onclick="getQibla()">🧭 Qibla Direction</button>
+      <a class="btn secondary" href="https://www.google.com/maps/search/mosques+near+New+York" target="_blank">📍 Mosques near NY</a></div>
+      <div class="card"><h3>⛪ Christian Services</h3><a class="btn secondary" href="https://www.google.com/maps/search/churches+near+New+York" target="_blank">📍 Churches</a></div>
+      <div class="card"><h3>🕉️ Hindu Temples</h3><a class="btn secondary" href="https://www.google.com/maps/search/hindu+temple+near+New+York" target="_blank">📍 Temples</a></div>
+      <div class="card"><h3>🛐 Sikh Gurdwaras</h3><a class="btn secondary" href="https://www.google.com/maps/search/gurdwara+near+New+York" target="_blank">📍 Gurdwaras</a></div>
+      <div class="card"><h3>☸️ Buddhist Viharas</h3><a class="btn secondary" href="https://www.google.com/maps/search/buddhist+temple+near+New+York" target="_blank">📍 Viharas</a></div>
+      <div class="card"><h3>✡️ Jewish Synagogues</h3><a class="btn secondary" href="https://www.google.com/maps/search/synagogue+near+New+York" target="_blank">📍 Synagogues</a></div>
+    </div>
+  `;
+}
+
+function renderTravel() {
+  return `
+    <div class="section" id="travel">
+      <div class="card"><h3>🌤️ Host City Weather</h3>
+        <select id="weatherCity" onchange="fetchWeather()">
+          <option value="40.71,-74.01">New York</option>
+          <option value="34.05,-118.24">Los Angeles</option>
+          <option value="43.65,-79.38">Toronto</option>
+          <option value="19.43,-99.13">Mexico City</option>
+        </select>
+        <div id="weatherResult" class="mt-2">Select a city to see weather</div>
+        <p style="font-size:0.8em;">Data from Open-Meteo (free, no tracking).</p>
+      </div>
+      <div class="card"><h3>🍽️ Halal Restaurants</h3><a class="btn" href="https://www.google.com/maps/search/halal+restaurant+near+New+York" target="_blank">Find Halal Food</a></div>
+      <div class="card"><h3>🕌 Ethical Hotels</h3>
+        <a class="btn" href="https://www.halalbooking.com/?affiliate_id=YOURID" target="_blank">Halal‑friendly Hotels (affiliate)</a>
+        <a class="btn secondary" href="https://www.google.com/maps/search/hotels+near+New+York" target="_blank">Find any hotel (map)</a>
+        <p style="font-size:0.8em;">HalalBooking: alcohol‑free, family‑safe stays. The map link is just a general search, non‑commission.</p>
+      </div>
+      <div class="card"><h3>💇 Personal Care</h3>
+        <a class="btn secondary" href="https://www.google.com/maps/search/barber+shop+near+me" target="_blank">Barber / Salon</a>
+        <a class="btn secondary" href="https://www.google.com/maps/search/laundry+near+me" target="_blank">Laundry</a>
+      </div>
+      <div class="card"><h3>🏋️ Gyms & Parks</h3><a class="btn secondary" href="https://www.google.com/maps/search/gym+near+New+York" target="_blank">Gyms</a> <a class="btn secondary" href="https://www.google.com/maps/search/parks+near+New+York" target="_blank">Parks</a></div>
+      <div class="card"><h3>🚗 Travel Safe</h3><p>Safe routes avoid bars/clubs. Emergency: 911 (USA/Canada/Mexico).</p>
+        <p><strong>Stadiums:</strong> <a href="https://www.google.com/maps/dir/?api=1&destination=MetLife+Stadium" target="_blank">MetLife (NY)</a>, <a href="https://www.google.com/maps/dir/?api=1&destination=SoFi+Stadium" target="_blank">SoFi (LA)</a>, <a href="https://www.google.com/maps/dir/?api=1&destination=Estadio+Azteca" target="_blank">Azteca (MX)</a></p>
+      </div>
+      <div class="card"><h3>🚕 Uber</h3><a class="btn" href="https://bit.ly/goalmate-uber" target="_blank">Book Uber (affiliate)</a></div>
+      <div class="card"><h3>🌐 Live Translation</h3><a class="btn secondary" href="https://translate.google.com" target="_blank">Google Translate</a></div>
+    </div>
+  `;
+}
+
+function renderHealth() {
+  return `
+    <div class="section" id="health">
+      <div class="alert"><strong>Disclaimer:</strong> We only facilitate. No medical advice.</div>
+      <div class="card"><h3>🏥 Hospitals</h3><a class="btn" href="https://www.google.com/maps/search/hospital+near+me" target="_blank">Find Hospitals</a></div>
+      <div class="card"><h3>👩‍⚕️ Female Doctors</h3><a class="btn" href="https://www.google.com/maps/search/female+doctor+near+me" target="_blank">Find Female Doctor</a></div>
+      <div class="card"><h3>🌿 Alternative Medicine</h3><a class="btn secondary" href="https://www.google.com/maps/search/ayurveda+near+me" target="_blank">Ayurveda</a> <a class="btn secondary" href="https://www.google.com/maps/search/homeopathy+near+me" target="_blank">Homeopathy</a></div>
+    </div>
+  `;
+}
+
+function renderFamily() {
+  return `
+    <div class="section" id="family">
+      <div class="card"><h3>👶 Kids Mode</h3>
+      <button class="btn" onclick="startFlagGame()">🏁 Flag Game</button>
+      <button class="btn secondary" onclick="trivia()">❓ Trivia</button>
+      <a class="btn secondary" href="https://www.coloring.ws/soccer.htm" target="_blank">🖍️ Coloring Pages</a>
+      <div>🐯 Virtual Mascot: Goal-E</div>
+      </div>
+      <div class="card"><h3>🧓 Elderly Mode</h3>
+      <button class="btn" onclick="toggleElderly()">${elderlyMode ? 'Disable' : 'Enable'} Large Text</button>
+      <button class="btn secondary" onclick="restReminder()">⏰ Rest Reminder</button></div>
+      <div class="card"><h3>🧣 Digital Scarf</h3><button class="btn" onclick="createScarf()">Create USA Scarf</button></div>
+      <div class="card"><h3>📍 Family Locator</h3>
+      <button class="btn" onclick="shareLocation()">Share My Location (Free)</button>
+      ${premiumUnlocked ? '<p class="mt-2">🔒 <strong>Live Tracking:</strong> Coming soon for Premium users.</p>' : '<p class="mt-2"><em>Upgrade to Premium for live family tracking.</em></p>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderWallet() {
+  return `
+    <div class="section" id="wallet">
+      <div class="card"><h3>💱 Currency Converter</h3>
+      <select id="fromCurrency"><option>USD</option><option>CAD</option><option>MXN</option><option>PKR</option></select>
+      <input id="amount" type="number" value="1" placeholder="Amount">
+      <p>To PKR: <span id="converted">-</span></p>
+      <button class="btn" onclick="convertCurrency()">Convert (mock rates)</button></div>
+      <div class="card"><h3>💵 Daily Budget</h3><p>Food: $30, Transport: $20, Tickets: $100 = $150/day</p></div>
+      <div class="card"><h3>💸 Money Transfer</h3><a class="btn" href="https://bit.ly/goalmate-taptap" target="_blank">TapTap Send (affiliate)</a></div>
+      <div class="card"><h3>💡 Tipping Guide</h3><p>USA: 15-20%, Canada: 15-20%, Mexico: 10-15%</p></div>
+    </div>
+  `;
+}
+
+function renderPremium() {
+  return `
+    <div class="section" id="premium">
+      <div class="card">
+        <h3>⭐ Premium (One-time $5)</h3>
+        <ul>
+          <li>📥 <strong>Offline Host City Guide</strong> – maps, halal food, prayer spots, emergency numbers. Works without internet.</li>
+          <li>📺 <strong>Full Match Replays & Extended Highlights</strong></li>
+          <li>📍 <strong>Family Locator with Live Tracking</strong></li>
+          <li>📊 <strong>Exclusive Tactical Analysis & Fan Stories</strong></li>
+          <li>🚫 <strong>No Ads Ever</strong></li>
+        </ul>
+        ${premiumUnlocked ? '<p><strong>Premium Active ✅</strong></p>' : `
+        <p><strong>How to unlock:</strong> Payment method coming soon. For now, use demo code <strong>WC2026FREE</strong> to test all features.</p>
+        <input id="premiumCode" placeholder="Enter unlock code">
+        <button class="btn" onclick="unlockPremium()">Activate</button>
+        `}
+        ${premiumUnlocked ? '<div class="card mt-2"><h4>📥 Offline Guide</h4><p>Essential info saved for offline use. <a class="btn secondary" href="#" onclick="alert(\'This guide is cached. You can view it even without internet.\')">View Offline Guide</a></p></div>' : ''}
+      </div>
+      ${premiumUnlocked ? `<div class="card"><h4>📊 Exclusive Analysis</h4><p>Coming: in-depth tactical breakdowns from legal football analysts.</p></div>` : ''}
+      <div class="card" style="background: #f9fbe7; border-left: 4px solid #558b2f;">
+        <h3>💚 This app is free — by fans, for fans</h3>
+        <p>If GoalMate saved you money or made your trip better, you can support us with any amount you feel is fair. No minimum, no subscription, no pressure.</p>
+        <div class="flex-row">
+          <a class="btn" href="https://www.buymeacoffee.com/YOURNAME" target="_blank">☕ Pay What You Feel (Card)</a>
+          <button class="btn secondary" disabled>🏦 Direct Account (Coming Soon)</button>
+        </div>
+        <p style="font-size:0.8em;">Card payments via Buy Me a Coffee. Your support keeps the app free for all fans.</p>
+      </div>
+    </div>
+  `;
+}
+
+function renderAll() {
+  content.innerHTML = renderMatchCenter() + renderFaith() + renderTravel() + renderHealth() + renderFamily() + renderWallet() + renderPremium();
+}
+renderAll();
+</script>
+</body>
+</html>
